@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spacefy - Cubicaje 3D Profesional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <style>
+        :root {
+            --color-primary: #0f172a;
+            --color-secondary: #1e293b;
+            --color-accent: #2563eb;
+            --color-accent-light: #3b82f6;
+            --color-accent-dark: #1d4ed8;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --color-text-light: #f8fafc;
+            --color-text-secondary: #cbd5e1;
+            --color-surface: #1e293b;
+            --color-surface-light: #334155;
+            --color-border: #475569;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-body);
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: var(--color-text-light);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            background: var(--color-surface);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--color-accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-text-light);
+        }
+
+        .logo-subtitle {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+            margin-top: -5px;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1400px;
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 20px;
+        }
+
+        /* Panel de Control */
+        .control-panel {
+            background: var(--color-surface);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .panel-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-text-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .section-title i {
+            color: var(--color-accent);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+        }
+
+        .form-select, .form-input {
+            background: var(--color-surface-light);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--color-text-light);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .form-select:focus, .form-input:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .dimensions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .dimension-input {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .dimension-label {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+            text-align: center;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .checkbox-label {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-accent-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--color-surface-light);
+            color: var(--color-text-light);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-border);
+        }
+
+        .btn-danger {
+            background: var(--color-danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* Lista de Items */
+        .items-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            background: var(--color-surface-light);
+        }
+
+        .items-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .items-list::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: 3px;
+        }
+
+        .item-card {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-card:last-child {
+            border-bottom: none;
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .item-details {
+            font-size: 0.75rem;
+            color: var(--color-text-secondary);
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: var(--color-border);
+            color: var(--color-text-light);
+        }
+
+        .btn-icon-danger:hover {
+            background: var(--color-danger);
+            color: white;
+        }
+
+        /* Vista 3D */
+        .viewer-container {
+            background: var(--color-surface);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            height: 780px;
+        }
+
+        .viewer-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .viewer-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--color-text-light);
+        }
+
+        .viewer-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .viewer-content {
+            flex: 1;
+            position: relative;
+            background: #0f172a;
+        }
+
+        #escena-3d {
+            width: 100%;
+            height: 100%;
+        }
+
+        .viewer-overlay {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid var(--color-border);
+            color: var(--color-text-light);
+            font-size: 0.8rem;
+            max-width: 200px;
+        }
+
+        .viewer-stats {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--color-border);
+            color: var(--color-text-light);
+            font-size: 0.85rem;
+            width: 300px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--color-accent);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--color-text-secondary);
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            flex-direction: column;
+            gap: 16px;
+            color: var(--color-text-light);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(59, 130, 246, 0.3);
+            border-top: 4px solid var(--color-accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        footer {
+            background: var(--color-surface);
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            border-top: 1px solid var(--color-border);
+        }
+
+        /* Mensajes */
+        .empty-state {
+            padding: 20px;
+            text-align: center;
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .control-panel {
+                position: static;
+            }
+            
+            .viewer-container {
+                height: 600px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            main {
+                padding: 16px;
+            }
+            
+            .viewer-container {
+                height: 500px;
+            }
+            
+            .viewer-stats {
+                width: calc(100% - 32px);
+            }
+            
+            .dimensions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mejoras específicas para el formulario */
+        .form-input:invalid {
+            border-color: var(--color-danger);
+        }
+        
+        .form-input:valid {
+            border-color: var(--color-success);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .quick-btn {
+            flex: 1;
+            padding: 8px;
+            background: var(--color-surface-light);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            color: var(--color-text-secondary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .quick-btn:hover {
+            background: var(--color-accent);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-cube"></i>
+            </div>
+            <div>
+                <div class="logo-text">Spacefy 3D</div>
+                <div class="logo-subtitle">CUBICAJE PROFESIONAL</div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="app-container">
+            <!-- Panel de Control -->
+            <div class="control-panel">
+                <!-- Selección de Contenedor -->
+                <div class="panel-section">
+                    <div class="section-title">
+                        <i class="fas fa-box"></i>
+                        Contenedor
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de contenedor</label>
+                        <select id="contenedor-select" class="form-select">
+                            <option value="20ft">Contenedor 20' Dry (5.89x2.35x2.39m)</option>
+                            <option value="40ft" selected>Contenedor 40' Dry (12.03x2.35x2.39m)</option>
+                            <option value="40hc">Contenedor 40' High Cube (12.03x2.35x2.69m)</option>
+                            <option value="camion">Camión Estándar (13.6x2.45x2.7m)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Configuración de Paletización -->
+                <div class="panel-section">
+                    <div class="section-title">
+                        <i class="fas fa-pallet"></i>
+                        Paletización
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo de pallet</label>
+                        <select id="pallet-select" class="form-select">
+                            <option value="none">No usar pallets</option>
+                            <option value="euro">Pallet Europeo (1.20x0.80x0.14m)</option>
+                            <option value="america">Pallet Americano (1.20x1.00x0.14m)</option>
+                        </select>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="optimizar-pallet" checked>
+                        <label class="checkbox-label" for="optimizar-pallet">Optimizar disposición en pallets</label>
+                    </div>
+                </div>
+
+                <!-- Gestión de Artículos - FORMULARIO MEJORADO -->
+                <div class="panel-section">
+                    <div class="section-title">
+                        <i class="fas fa-boxes"></i>
+                        Añadir Artículos
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="form-label">Nombre del artículo</label>
+                        <input type="text" id="item-nombre" class="form-input" placeholder="Ej: Caja A" value="Caja A" required>
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="form-label">Cantidad</label>
+                            <input type="number" id="item-cantidad" class="form-input" value="1" min="1" max="100" required>
+                        </div>
+                        <div class="input-group">
+                            <label class="form-label">Peso (kg)</label>
+                            <input type="number" id="item-peso" class="form-input" value="20" min="0.1" step="0.1" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Dimensiones (metros)</label>
+                        <div class="dimensions-grid">
+                            <div class="dimension-input">
+                                <input type="number" id="item-largo" class="form-input" placeholder="Largo" step="0.01" min="0.1" value="0.8" required>
+                                <div class="dimension-label">Largo</div>
+                            </div>
+                            <div class="dimension-input">
+                                <input type="number" id="item-ancho" class="form-input" placeholder="Ancho" step="0.01" min="0.1" value="0.6" required>
+                                <div class="dimension-label">Ancho</div>
+                            </div>
+                            <div class="dimension-input">
+                                <input type="number" id="item-alto" class="form-input" placeholder="Alto" step="0.01" min="0.1" value="0.5" required>
+                                <div class="dimension-label">Alto</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="item-no-rotar">
+                        <label class="checkbox-label" for="item-no-rotar">No rotar artículo (fijar orientación)</label>
+                    </div>
+                    
+                    <!-- Botones de acción rápida -->
+                    <div class="quick-actions">
+                        <button type="button" class="quick-btn" id="btn-small">
+                            <i class="fas fa-box"></i> Pequeña
+                        </button>
+                        <button type="button" class="quick-btn" id="btn-medium">
+                            <i class="fas fa-box"></i> Mediana
+                        </button>
+                        <button type="button" class="quick-btn" id="btn-large">
+                            <i class="fas fa-box"></i> Grande
+                        </button>
+                    </div>
+                    
+                    <button id="add-item-btn" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i>
+                        Añadir a la Lista
+                    </button>
+                </div>
+
+                <!-- Lista de Artículos -->
+                <div class="panel-section">
+                    <div class="section-title">
+                        <i class="fas fa-list-check"></i>
+                        Lista de Artículos
+                        <span id="items-count" class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">0</span>
+                    </div>
+                    <div id="lista-items" class="items-list">
+                        <div class="empty-state">No hay artículos añadidos</div>
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="panel-section">
+                    <div class="section-title">
+                        <i class="fas fa-play-circle"></i>
+                        Ejecutar Cubicaje
+                    </div>
+                    <div class="buttons-grid">
+                        <button id="calculate-btn" class="btn btn-primary">
+                            <i class="fas fa-calculator"></i>
+                            Calcular
+                        </button>
+                        <button id="reset-btn" class="btn btn-danger">
+                            <i class="fas fa-trash-alt"></i>
+                            Limpiar Todo
+                        </button>
+                    </div>
+                    <button id="export-btn" class="btn btn-secondary">
+                        <i class="fas fa-file-export"></i>
+                        Exportar Resultados
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vista 3D -->
+            <div class="viewer-container">
+                <div class="viewer-header">
+                    <div class="viewer-title">Visualización 3D del Cubicaje</div>
+                    <div class="viewer-controls">
+                        <button id="view-top" class="btn-icon" title="Vista Superior">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button id="view-front" class="btn-icon" title="Vista Frontal">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button id="view-side" class="btn-icon" title="Vista Lateral">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button id="view-reset" class="btn-icon" title="Resetear Vista">
+                            <i class="fas fa-crosshairs"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="viewer-content">
+                    <div id="escena-3d"></div>
+                    
+                    <div class="viewer-overlay">
+                        <div style="font-weight: 600; margin-bottom: 8px;">Controles 3D</div>
+                        <div>Rotar: Click izquierdo + arrastrar</div>
+                        <div>Zoom: Rueda del ratón</div>
+                        <div>Mover: Click derecho + arrastrar</div>
+                    </div>
+                    
+                    <div class="viewer-stats">
+                        <div style="font-weight: 600; margin-bottom: 8px;">Estadísticas de Carga</div>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value">0%</div>
+                                <div class="stat-label">Utilización</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">0/0</div>
+                                <div class="stat-label">Artículos</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">0 kg</div>
+                                <div class="stat-label">Peso Total</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">0 m³</div>
+                                <div class="stat-label">Volumen</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+                        <div class="spinner"></div>
+                        <div>Calculando disposición óptima...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        © 2023 Spacefy - Sistema Avanzado de Cubicaje 3D
+    </footer>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Variables globales
+        let scene, camera, renderer, controls;
+        let containerMesh, floorMesh;
+        let itemsOnScene = [];
+        let itemsToLoad = [];
+        let allItems = [];
+        let currentPallets = [];
+        let stats = {
+            utilization: 0,
+            itemsPacked: 0,
+            totalItems: 0,
+            totalWeight: 0,
+            totalVolume: 0
+        };
+
+        // Configuración CORREGIDA - Escala exacta 1:1
+        const METERS_TO_UNITS = 1; // 1 metro = 1 unidad Three.js
+
+        const containerDefinitions = {
+            '20ft': { 
+                w: 5.89, 
+                h: 2.39, 
+                d: 2.35, 
+                name: "20' Dry", 
+                maxWeight: 28000 
+            },
+            '40ft': { 
+                w: 12.03, 
+                h: 2.39, 
+                d: 2.35, 
+                name: "40' Dry", 
+                maxWeight: 29000 
+            },
+            '40hc': { 
+                w: 12.03, 
+                h: 2.69, 
+                d: 2.35, 
+                name: "40' High Cube", 
+                maxWeight: 30000 
+            },
+            'camion': { 
+                w: 13.6, 
+                h: 2.7, 
+                d: 2.45, 
+                name: "Camión Estándar", 
+                maxWeight: 22000 
+            }
+        };
+        
+        const palletDefinitions = {
+            'none': { l: 0, w: 0, h: 0, name: "No Pallet", weight: 0 },
+            'euro': { l: 1.20, w: 0.80, h: 0.14, name: "EUR Pallet", weight: 25 },
+            'america': { l: 1.20, w: 1.00, h: 0.14, name: "AM Pallet", weight: 30 }
+        };
+        
+        // Configuraciones predefinidas para artículos
+        const itemPresets = {
+            small: { l: 0.4, w: 0.3, h: 0.3, weight: 5 },
+            medium: { l: 0.8, w: 0.6, h: 0.5, weight: 20 },
+            large: { l: 1.2, w: 0.8, h: 0.7, weight: 35 }
+        };
+        
+        let currentPalletType = palletDefinitions['none'];
+        let currentContainer = containerDefinitions['40ft'];
+
+        // Elementos UI
+        const ui = {
+            sceneContainer: document.getElementById('escena-3d'),
+            containerSelect: document.getElementById('contenedor-select'),
+            palletSelect: document.getElementById('pallet-select'),
+            addItemBtn: document.getElementById('add-item-btn'),
+            calculateBtn: document.getElementById('calculate-btn'),
+            resetBtn: document.getElementById('reset-btn'),
+            exportBtn: document.getElementById('export-btn'),
+            itemsList: document.getElementById('lista-items'),
+            itemsCount: document.getElementById('items-count'),
+            itemName: document.getElementById('item-nombre'),
+            itemQty: document.getElementById('item-cantidad'),
+            itemL: document.getElementById('item-largo'),
+            itemW: document.getElementById('item-ancho'),
+            itemH: document.getElementById('item-alto'),
+            itemWeight: document.getElementById('item-peso'),
+            itemNoRotate: document.getElementById('item-no-rotar'),
+            loadingOverlay: document.getElementById('loading-overlay'),
+            viewTop: document.getElementById('view-top'),
+            viewFront: document.getElementById('view-front'),
+            viewSide: document.getElementById('view-side'),
+            viewReset: document.getElementById('view-reset'),
+            btnSmall: document.getElementById('btn-small'),
+            btnMedium: document.getElementById('btn-medium'),
+            btnLarge: document.getElementById('btn-large')
+        };
+
+        // Inicialización
+        function init() {
+            createScene();
+            setupEventListeners();
+            updateContainer();
+            updateItemsCount();
+            animate();
+            
+            // Añadir algunos artículos de ejemplo
+            addExampleItems();
+        }
+
+        function createScene() {
+            // Escena
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0f172a);
+            
+            // Cámara - Posición mejorada para mejor visualización
+            camera = new THREE.PerspectiveCamera(60, ui.sceneContainer.clientWidth / ui.sceneContainer.clientHeight, 0.1, 100);
+            camera.position.set(15, 10, 15);
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ 
+                antialias: true, 
+                alpha: true,
+                precision: 'highp'
+            });
+            renderer.setSize(ui.sceneContainer.clientWidth, ui.sceneContainer.clientHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            ui.sceneContainer.appendChild(renderer.domElement);
+            
+            // Controles
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 5;
+            controls.maxDistance = 50;
+            
+            // Iluminación mejorada
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(15, 20, 15);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            directionalLight.shadow.camera.near = 0.5;
+            directionalLight.shadow.camera.far = 50;
+            scene.add(directionalLight);
+            
+            // Grid mejorado
+            const gridHelper = new THREE.GridHelper(30, 30, 0x334155, 0x1e293b);
+            gridHelper.position.y = 0;
+            scene.add(gridHelper);
+        }
+
+        function setupEventListeners() {
+            // Cambios de configuración
+            ui.containerSelect.addEventListener('change', updateContainer);
+            ui.palletSelect.addEventListener('change', updatePalletType);
+            
+            // Gestión de artículos
+            ui.addItemBtn.addEventListener('click', addItemToList);
+            ui.calculateBtn.addEventListener('click', calculateLoadPlan);
+            ui.resetBtn.addEventListener('click', resetScene);
+            ui.exportBtn.addEventListener('click', exportResults);
+            
+            // Botones de acción rápida
+            ui.btnSmall.addEventListener('click', () => applyItemPreset('small'));
+            ui.btnMedium.addEventListener('click', () => applyItemPreset('medium'));
+            ui.btnLarge.addEventListener('click', () => applyItemPreset('large'));
+            
+            // Controles de vista
+            ui.viewTop.addEventListener('click', () => setCameraView('top'));
+            ui.viewFront.addEventListener('click', () => setCameraView('front'));
+            ui.viewSide.addEventListener('click', () => setCameraView('side'));
+            ui.viewReset.addEventListener('click', () => setCameraView('reset'));
+            
+            // Validación en tiempo real
+            ui.itemName.addEventListener('input', validateForm);
+            ui.itemQty.addEventListener('input', validateForm);
+            ui.itemL.addEventListener('input', validateForm);
+            ui.itemW.addEventListener('input', validateForm);
+            ui.itemH.addEventListener('input', validateForm);
+            ui.itemWeight.addEventListener('input', validateForm);
+            
+            // Redimensionado
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function validateForm() {
+            const nombre = ui.itemName.value.trim();
+            const cantidad = parseInt(ui.itemQty.value);
+            const largo = parseFloat(ui.itemL.value);
+            const ancho = parseFloat(ui.itemW.value);
+            const alto = parseFloat(ui.itemH.value);
+            const peso = parseFloat(ui.itemWeight.value);
+            
+            const isValid = nombre && 
+                           cantidad > 0 && 
+                           largo > 0 && 
+                           ancho > 0 && 
+                           alto > 0 && 
+                           peso > 0;
+            
+            ui.addItemBtn.disabled = !isValid;
+            return isValid;
+        }
+
+        function applyItemPreset(preset) {
+            const config = itemPresets[preset];
+            ui.itemL.value = config.l;
+            ui.itemW.value = config.w;
+            ui.itemH.value = config.h;
+            ui.itemWeight.value = config.weight;
+            ui.itemName.value = `Caja ${preset.charAt(0).toUpperCase() + preset.slice(1)}`;
+            validateForm();
+        }
+
+        function onWindowResize() {
+            if (!camera || !renderer) return;
+            camera.aspect = ui.sceneContainer.clientWidth / ui.sceneContainer.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(ui.sceneContainer.clientWidth, ui.sceneContainer.clientHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function updateContainer() {
+            clearScene();
+            
+            const selected = ui.containerSelect.value;
+            currentContainer = containerDefinitions[selected];
+            
+            // Crear contenedor con dimensiones exactas
+            const containerGeometry = new THREE.BoxGeometry(
+                currentContainer.w, 
+                currentContainer.h, 
+                currentContainer.d
+            );
+            
+            // Contenedor transparente con bordes visibles
+            const edges = new THREE.EdgesGeometry(containerGeometry);
+            const lineMaterial = new THREE.LineBasicMaterial({ 
+                color: 0x3b82f6, 
+                linewidth: 3,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            containerMesh = new THREE.LineSegments(edges, lineMaterial);
+            
+            // Posicionar contenedor centrado en el origen
+            containerMesh.position.set(0, currentContainer.h / 2, 0);
+            scene.add(containerMesh);
+            
+            // Crear suelo del contenedor
+            const floorGeometry = new THREE.PlaneGeometry(
+                currentContainer.w, 
+                currentContainer.d
+            );
+            const floorMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x1e293b, 
+                transparent: true, 
+                opacity: 0.3,
+                side: THREE.DoubleSide
+            });
+            
+            floorMesh = new THREE.Mesh(floorGeometry, floorMaterial);
+            floorMesh.rotation.x = Math.PI / 2;
+            floorMesh.position.set(0, 0.01, 0);
+            scene.add(floorMesh);
+        }
+
+        function updatePalletType() {
+            currentPalletType = palletDefinitions[ui.palletSelect.value];
+        }
+
+        function addExampleItems() {
+            // Añadir algunos artículos de ejemplo para demostración
+            const exampleItems = [
+                { name: "Caja Pequeña", l: 0.5, w: 0.4, h: 0.3, weight: 10, qty: 8 },
+                { name: "Caja Mediana", l: 0.8, w: 0.6, h: 0.5, weight: 20, qty: 5 },
+                { name: "Caja Grande", l: 1.2, w: 0.8, h: 0.7, weight: 35, qty: 3 }
+            ];
+            
+            exampleItems.forEach(item => {
+                for (let i = 0; i < item.qty; i++) {
+                    const itemObj = {
+                        id: Date.now() + Math.random(),
+                        name: item.name,
+                        l: item.l,
+                        w: item.w, 
+                        h: item.h,
+                        weight: item.weight, 
+                        qty: 1,
+                        noRotate: false,
+                        color: new THREE.Color().setHSL(Math.random() * 0.3 + 0.5, 0.7, 0.5)
+                    };
+                    itemsToLoad.push(itemObj);
+                }
+            });
+            
+            renderItemsList();
+            updateItemsCount();
+        }
+
+        function addItemToList() {
+            if (!validateForm()) {
+                alert('Por favor, complete todos los campos con valores válidos.');
+                return;
+            }
+
+            const nombre = ui.itemName.value.trim();
+            const cantidad = parseInt(ui.itemQty.value);
+            const largo = parseFloat(ui.itemL.value);
+            const ancho = parseFloat(ui.itemW.value);
+            const alto = parseFloat(ui.itemH.value);
+            const peso = parseFloat(ui.itemWeight.value);
+
+            const item = {
+                id: Date.now() + Math.random(),
+                name: nombre,
+                l: largo,
+                w: ancho, 
+                h: alto,
+                weight: peso, 
+                qty: cantidad, 
+                noRotate: ui.itemNoRotate.checked,
+                color: new THREE.Color().setHSL(Math.random() * 0.3 + 0.5, 0.7, 0.5)
+            };
+            
+            itemsToLoad.push(item);
+            renderItemsList();
+            updateItemsCount();
+            generateNextItem();
+        }
+
+        function renderItemsList() {
+            ui.itemsList.innerHTML = '';
+            
+            if (itemsToLoad.length === 0) {
+                ui.itemsList.innerHTML = '<div class="empty-state">No hay artículos añadidos</div>';
+                return;
+            }
+            
+            itemsToLoad.forEach((item, index) => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'item-card';
+                itemCard.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-details">${item.l.toFixed(2)}x${item.w.toFixed(2)}x${item.h.toFixed(2)}m • ${item.weight}kg</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn-icon btn-icon-danger" data-index="${index}" title="Eliminar artículo">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                ui.itemsList.appendChild(itemCard);
+            });
+
+            // Agregar event listeners a los botones de eliminar
+            document.querySelectorAll('.btn-icon-danger').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                    itemsToLoad.splice(index, 1);
+                    renderItemsList();
+                    updateItemsCount();
+                });
+            });
+        }
+
+        function updateItemsCount() {
+            const totalItems = itemsToLoad.reduce((sum, item) => sum + item.qty, 0);
+            ui.itemsCount.textContent = totalItems;
+        }
+
+        function generateNextItem() {
+            // Generar un artículo aleatorio para el siguiente ingreso
+            const types = ['small', 'medium', 'large'];
+            const randomType = types[Math.floor(Math.random() * types.length)];
+            applyItemPreset(randomType);
+            ui.itemQty.value = Math.floor(Math.random() * 5) + 1;
+        }
+
+        function clearScene() {
+            // Eliminar items y pallets
+            itemsOnScene.forEach(item => scene.remove(item));
+            currentPallets.forEach(pallet => scene.remove(pallet));
+            itemsOnScene = [];
+            currentPallets = [];
+            
+            // Eliminar contenedor y suelo
+            if (containerMesh) scene.remove(containerMesh);
+            if (floorMesh) scene.remove(floorMesh);
+        }
+
+        function resetScene() {
+            if (confirm('¿Está seguro de que desea limpiar todos los artículos y reiniciar el planificador?')) {
+                itemsToLoad = [];
+                renderItemsList();
+                updateItemsCount();
+                clearScene();
+                updateContainer();
+                updateStats();
+            }
+        }
+
+        async function calculateLoadPlan() {
+            if (itemsToLoad.length === 0) {
+                alert('Añada al menos un artículo para calcular el plan de carga.');
+                return;
+            }
+
+            ui.loadingOverlay.style.display = 'flex';
+            
+            // Simular procesamiento
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            clearScene();
+            updateContainer();
+            
+            // Generar items para empaquetar
+            allItems = [];
+            itemsToLoad.forEach(itemGroup => {
+                for (let i = 0; i < itemGroup.qty; i++) {
+                    allItems.push({ 
+                        ...itemGroup, 
+                        id: `${itemGroup.id}_${i}`,
+                        packed: false
+                    });
+                }
+            });
+            
+            // Empaquetar items con el nuevo algoritmo
+            const packedItems = packItemsOptimized();
+            
+            // Actualizar estadísticas
+            updateStats(packedItems);
+            
+            ui.loadingOverlay.style.display = 'none';
+        }
+
+        // NUEVO ALGORITMO DE EMPAQUETAMIENTO OPTIMIZADO
+        function packItemsOptimized() {
+            const packedItems = [];
+            const container = {
+                w: currentContainer.w,
+                h: currentContainer.h,
+                d: currentContainer.d
+            };
+            
+            // Ordenar items por volumen (mayor primero) para mejor optimización
+            allItems.sort((a, b) => (b.l * b.w * b.h) - (a.l * a.w * a.h));
+            
+            // Si hay pallets, colocar primero los pallets
+            if (currentPalletType.h > 0) {
+                placePallets();
+            }
+            
+            // Espacios disponibles (inicialmente todo el contenedor)
+            let availableSpaces = [{
+                x: -container.w/2,
+                y: currentPalletType.h, // Empezar encima de los pallets
+                z: -container.d/2,
+                w: container.w,
+                h: container.h - currentPalletType.h,
+                d: container.d
+            }];
+            
+            // Función para obtener todas las orientaciones posibles (rotaciones de 90°)
+            function getOrientations(item) {
+                if (item.noRotate) {
+                    return [{ l: item.l, w: item.w, h: item.h }];
+                }
+                
+                return [
+                    { l: item.l, w: item.w, h: item.h },
+                    { l: item.l, w: item.h, h: item.w },
+                    { l: item.w, w: item.l, h: item.h },
+                    { l: item.w, w: item.h, h: item.l },
+                    { l: item.h, w: item.l, h: item.w },
+                    { l: item.h, w: item.w, h: item.l }
+                ];
+            }
+            
+            // Intentar colocar cada item
+            for (const item of allItems) {
+                let placed = false;
+                const orientations = getOrientations(item);
+                
+                // Buscar en todos los espacios disponibles
+                for (let spaceIndex = 0; spaceIndex < availableSpaces.length && !placed; spaceIndex++) {
+                    const space = availableSpaces[spaceIndex];
+                    
+                    // Probar todas las orientaciones
+                    for (const orientation of orientations) {
+                        if (orientation.l <= space.w && 
+                            orientation.h <= space.h && 
+                            orientation.w <= space.d) {
+                            
+                            // Calcular posición centrada en el espacio
+                            const position = {
+                                x: space.x + orientation.l/2,
+                                y: space.y + orientation.h/2,
+                                z: space.z + orientation.w/2
+                            };
+                            
+                            // Verificar que no sobresalga del contenedor
+                            if (Math.abs(position.x) + orientation.l/2 <= container.w/2 &&
+                                position.y + orientation.h/2 <= container.h &&
+                                Math.abs(position.z) + orientation.w/2 <= container.d/2) {
+                                
+                                // Colocar el item
+                                placeItemInScene(item, position, orientation);
+                                packedItems.push({ 
+                                    ...item, 
+                                    position, 
+                                    finalDims: orientation,
+                                    packed: true 
+                                });
+                                
+                                // Dividir el espacio restante
+                                const newSpaces = [];
+                                
+                                // Espacio encima del item
+                                if (space.h - orientation.h > 0.01) {
+                                    newSpaces.push({
+                                        x: space.x,
+                                        y: space.y + orientation.h,
+                                        z: space.z,
+                                        w: space.w,
+                                        h: space.h - orientation.h,
+                                        d: space.d
+                                    });
+                                }
+                                
+                                // Espacio a la derecha del item
+                                if (space.w - orientation.l > 0.01) {
+                                    newSpaces.push({
+                                        x: space.x + orientation.l,
+                                        y: space.y,
+                                        z: space.z,
+                                        w: space.w - orientation.l,
+                                        h: orientation.h,
+                                        d: space.d
+                                    });
+                                }
+                                
+                                // Espacio detrás del item
+                                if (space.d - orientation.w > 0.01) {
+                                    newSpaces.push({
+                                        x: space.x,
+                                        y: space.y,
+                                        z: space.z + orientation.w,
+                                        w: orientation.l,
+                                        h: orientation.h,
+                                        d: space.d - orientation.w
+                                    });
+                                }
+                                
+                                // Reemplazar el espacio usado por los nuevos espacios
+                                availableSpaces.splice(spaceIndex, 1);
+                                availableSpaces.push(...newSpaces);
+                                placed = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return packedItems;
+        }
+
+        function placePallets() {
+            if (currentPalletType.h === 0) return;
+            
+            const palletWidth = currentPalletType.l;
+            const palletDepth = currentPalletType.w;
+            const palletHeight = currentPalletType.h;
+            
+            const containerWidth = currentContainer.w;
+            const containerDepth = currentContainer.d;
+            
+            // Calcular cuántos pallets caben
+            const palletsX = Math.floor(containerWidth / palletWidth);
+            const palletsZ = Math.floor(containerDepth / palletDepth);
+            
+            // Colocar pallets centrados en el contenedor
+            const startX = -containerWidth/2 + palletWidth/2;
+            const startZ = -containerDepth/2 + palletDepth/2;
+            
+            for (let x = 0; x < palletsX; x++) {
+                for (let z = 0; z < palletsZ; z++) {
+                    const position = {
+                        x: startX + x * palletWidth,
+                        y: palletHeight/2, // Centrado en altura
+                        z: startZ + z * palletDepth
+                    };
+                    
+                    placePalletInScene(position, { 
+                        l: palletWidth, 
+                        h: palletHeight, 
+                        w: palletDepth 
+                    });
+                }
+            }
+        }
+
+        function placePalletInScene(position, dimensions) {
+            const geometry = new THREE.BoxGeometry(dimensions.l, dimensions.h, dimensions.w);
+            const material = new THREE.MeshStandardMaterial({ 
+                color: 0x8B4513,
+                transparent: true,
+                opacity: 0.9,
+                metalness: 0.2,
+                roughness: 0.7
+            });
+            
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            mesh.position.set(position.x, position.y, position.z);
+            
+            scene.add(mesh);
+            currentPallets.push(mesh);
+            
+            // Añadir bordes para mejor visualización
+            const edges = new THREE.EdgesGeometry(geometry);
+            const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ 
+                color: 0x4B2E2E, 
+                linewidth: 1 
+            }));
+            line.position.copy(mesh.position);
+            scene.add(line);
+            currentPallets.push(line);
+        }
+
+        function placeItemInScene(item, position, dimensions) {
+            const geometry = new THREE.BoxGeometry(dimensions.l, dimensions.h, dimensions.w);
+            const material = new THREE.MeshStandardMaterial({ 
+                color: item.color,
+                transparent: true,
+                opacity: 0.9,
+                metalness: 0.3,
+                roughness: 0.4
+            });
+            
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            mesh.position.set(position.x, position.y, position.z);
+            
+            scene.add(mesh);
+            itemsOnScene.push(mesh);
+            
+            // Añadir bordes para mejor visualización
+            const edges = new THREE.EdgesGeometry(geometry);
+            const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ 
+                color: 0x000000, 
+                linewidth: 1 
+            }));
+            line.position.copy(mesh.position);
+            scene.add(line);
+            itemsOnScene.push(line);
+        }
+
+        function updateStats(packedItems = []) {
+            const totalItems = allItems.length;
+            const itemsPacked = packedItems.length;
+            const utilization = totalItems > 0 ? (itemsPacked / totalItems * 100).toFixed(1) : 0;
+            
+            let totalWeight = 0;
+            let totalVolume = 0;
+            
+            packedItems.forEach(item => {
+                totalWeight += item.weight;
+                totalVolume += item.finalDims.l * item.finalDims.w * item.finalDims.h;
+            });
+            
+            // Añadir peso de pallets si existen
+            if (currentPallets.length > 0) {
+                totalWeight += currentPallets.length / 2 * currentPalletType.weight;
+            }
+            
+            // Actualizar UI
+            document.querySelectorAll('.stat-value')[0].textContent = `${utilization}%`;
+            document.querySelectorAll('.stat-value')[1].textContent = `${itemsPacked}/${totalItems}`;
+            document.querySelectorAll('.stat-value')[2].textContent = `${totalWeight.toFixed(0)} kg`;
+            document.querySelectorAll('.stat-value')[3].textContent = `${totalVolume.toFixed(2)} m³`;
+            
+            // Actualizar objeto stats
+            stats = {
+                utilization: parseFloat(utilization),
+                itemsPacked,
+                totalItems,
+                totalWeight,
+                totalVolume
+            };
+        }
+
+        function setCameraView(view) {
+            const containerCenter = {
+                x: 0,
+                y: currentContainer.h / 2,
+                z: 0
+            };
+            
+            switch(view) {
+                case 'top':
+                    camera.position.set(0, currentContainer.h + 5, 0);
+                    camera.lookAt(containerCenter.x, containerCenter.y, containerCenter.z);
+                    break;
+                case 'front':
+                    camera.position.set(0, containerCenter.y, currentContainer.d + 5);
+                    camera.lookAt(containerCenter.x, containerCenter.y, containerCenter.z);
+                    break;
+                case 'side':
+                    camera.position.set(currentContainer.w + 5, containerCenter.y, 0);
+                    camera.lookAt(containerCenter.x, containerCenter.y, containerCenter.z);
+                    break;
+                case 'reset':
+                    camera.position.set(15, 10, 15);
+                    camera.lookAt(containerCenter.x, containerCenter.y, containerCenter.z);
+                    break;
+            }
+            
+            controls.update();
+        }
+
+        function exportResults() {
+            if (stats.totalItems === 0) {
+                alert('No hay datos para exportar. Calcule primero un plan de carga.');
+                return;
+            }
+            
+            const data = {
+                container: currentContainer.name,
+                stats: stats,
+                items: itemsToLoad,
+                timestamp: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `spacefy-cubicaje-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
